@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import sys
+import argparse
 try:
     import ipfsapi
 except:
@@ -27,14 +28,30 @@ def get_folder_path(crackme_name):
     return path
 
 def main():
-    crackme_name = input('Crackme name > ')
-    crackme_full_path = input('Crackme full path> ')
-    author_name = input('Author name > ')
-    exec_type = input('Executable format (ELF, PE...) > ')
-    exec_type = input('Architecture (x86, x86-64, MIPS, ARM, AVR...) > ')
+    parser = argparse.ArgumentParser(description='Crackmes uploader to IPFS, generating the proper file structures and \
+            metadata')
+    parser.add_argument('-n', '--name', nargs=1, help='Name of the crackme')
+    parser.add_argument('-p', '--path', nargs=1, help='Path of the crackme')
+    parser.add_argument('-a', '--author', nargs=1, help='Author name or nickname')
+    parser.add_argument('-t', '--type', nargs=1, help='Binary type', choices=['ELF', 'PE'])
+    parser.add_argument('-x', '--arch', nargs=1, help='Binary architecture', choices=['x86', 'x86-64', 'MIPS', 'ARM', 'ARM64'])
+    parser.add_argument('--host', nargs=1, type=str, default='127.0.0.1', help='IPFS host, default: 127.0.0.1')
+    parser.add_argument('--port', nargs=1, type=int, default=5001, help='IPFS port, default: 5001')
+    args = parser.parse_args()
+
+    crackme_name = args.name[0]
+    crackme_full_path = args.path[0]
+    author_name = args.author[0]
+    exec_type = args.type[0]
+    exec_arch = args.arch[0]
     date = time.time()
 
+    ipfs_host = args.host
+    ipfs_port = args.port
+    print('port', ipfs_port, 'host', ipfs_host)
+
     path = get_folder_path(crackme_name)
+    print('PATH', path)
     create_dir(path)
 
     try:
@@ -43,15 +60,18 @@ def main():
         print('ERROR: File doesn\'t exist')
         sys.exit(1)
 
-
     with open(os.path.join(path, 'metadata.txt'), 'w+') as f:
         f.write(';'.join([crackme_name, author_name, str(date)]))
 
     # TODO: Allow to change this
-    api = ipfsapi.connect('127.0.0.1', 5001)
-    print('Your IPFS hash for the crackme is {0}'.format(
-                                                    api.add(path)[-1]['Hash']
-                                                    ))
+
+
+    api = ipfsapi.connect(ipfs_host, ipfs_port)
+    result = api.add(path)
+    if len(result) != 3:
+        print('ERROR: Not a path hash')
+    else:
+        print('Your IPFS hash for the crackme is {0}'.format(result[-1]['Hash']))
 
 if __name__ == '__main__':
     try:
