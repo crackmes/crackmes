@@ -9,11 +9,12 @@ We try to solve this problem, using a git repository to organize the crackmes, t
 
 ## How to upload a new crackme
 
-TODO
+Execute *crackme_uploader.py* which will create a IPFS hash. With that hash you can create a new crackme and send a PR. 
+Of course you will need to have ipfs installed and you should try to keep your daemon open so our dedicated server can download it an pin it.
 
 ## How to download a crackme
 
-TODO
+For now *download.py* script will download all the crackmes.
 
 ## How to write a review
 
