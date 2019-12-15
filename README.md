@@ -1,3 +1,6 @@
+## THIS PROJECT HAVE BEEN ABANDONED
+Check https://crackmes.one/ instead.
+
 # crackmes
 
 Open and censorship resistant crackmes repository
